@@ -27,6 +27,9 @@ fi;
 mkdir $DATADIR
 origDataDir=$DATADIR
 
+argDataDirSource="/data"
+clDataDirSource="/data"
+
 # Check if network arg is provided as the name of the geth genesis json file to use to start
 # the custom network
 if [ ! -n "$NETWORK" ]
@@ -66,25 +69,21 @@ else
   echo "ELCLIENT=$ELCLIENT using local ethereumjs binary from packages/client"
 fi;
 
-if [ -n "$ELCLIENT_IMAGE" ]
-then
-  argDataDirSource="/data"
-else
-  argDataDirSource="$DATADIR"
-fi;
-
-if [ -n "$LODE_IMAGE" ]
-then
-  clDataDirSource="/data"
-else
-  clDataDirSource="$DATADIR"
-fi;
-
 
 case $MULTIPEER in
   syncpeer)
     echo "setting up to run as a sync only peer to peer1 (bootnode)..."
     DATADIR="$DATADIR/syncpeer"
+
+    if [ -n "$ELCLIENT_BINARY" ]
+    then
+      argDataDirSource="$DATADIR"
+    fi;
+    if [ -n "$LODE_BINARY" ]
+    then
+      clDataDirSource="$DATADIR"
+    fi;
+
 
     case $ELCLIENT in 
       ethereumjs)
@@ -105,6 +104,16 @@ case $MULTIPEER in
     echo "setting up peer2 to run with peer1 (bootnode)..."
     DATADIR="$DATADIR/peer2"
 
+    if [ -n "$ELCLIENT_BINARY" ]
+    then
+      argDataDirSource="$DATADIR"
+    fi;
+    if [ -n "$LODE_BINARY" ]
+    then
+      clDataDirSource="$DATADIR"
+    fi;
+
+
     case $ELCLIENT in 
       ethereumjs)
         EL_PORT_ARGS="--port 30304 --rpcEnginePort 8552 --rpcPort 8946 --multiaddrs /ip4/127.0.0.1/tcp/50581/ws --bootnodes $elBootnode --logLevel debug"
@@ -122,6 +131,15 @@ case $MULTIPEER in
 
   * )
     DATADIR="$DATADIR/peer1"
+    if [ -n "$ELCLIENT_BINARY" ]
+    then
+      argDataDirSource="$DATADIR"
+    fi;
+    if [ -n "$LODE_BINARY" ]
+    then
+      clDataDirSource="$DATADIR"
+    fi;
+
 
     case $ELCLIENT in 
       ethereumjs)
@@ -183,6 +201,10 @@ then
 fi;
 
 run_cmd(){
+  echo ""
+  echo ""
+  echo "--------------------------------------------------------------------------------------"
+  echo "--------------------------------------------------------------------------------------"
   execCmd=$1;
   if [ -n "$DETACHED" ]
   then
@@ -196,6 +218,10 @@ run_cmd(){
     echo "running: $execCmd &"
     eval "$execCmd" &
   fi;
+  echo "--------------------------------------------------------------------------------------"
+  echo ""
+  echo ""
+  echo ""
 }
 
 cleanup() {
