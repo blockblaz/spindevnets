@@ -69,3 +69,10 @@ else
   ELCLIENT="ethereumjs"
   echo "ELCLIENT=$ELCLIENT using local ethereumjs binary from packages/client"
 fi;
+
+
+if [ -n ELCLIENT_IMAGE ]
+then
+  echo "pulling latest ELCLIENT_IMAGE=$ELCLIENT_IMAGE"
+  docker pull $ELCLIENT_IMAGE
+fi;

@@ -136,6 +136,13 @@ then
 else
   lodeCmd="$LODE_BINARY dev --dataDir $clDataDirSource/lodestar --jwt-secret $clDataDirSource/jwtsecret  $CL_PORT_ARGS"
 fi;
+
+
+if [ -n LODE_IMAGE ]
+then
+  echo "pulling latest LODE_IMAGE=$LODE_IMAGE"
+  docker pull $LODE_IMAGE
+fi;
 run_cmd "$lodeCmd"
 lodePid=$!
 echo "lodePid: $lodePid"
