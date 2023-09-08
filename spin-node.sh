@@ -167,7 +167,7 @@ then
   then
     setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $ELCLIENT_IMAGE --datadir $argDataDirSource/geth init /config/genesis.json"
   else
-    setupCmd="$ELCLIENT_BINARY --datadir $DATADIR/geth init $configDir/genesis.json"
+    setupCmd="$ELCLIENT_BINARY --datadir $argDataDirSource/geth init $configDir/genesis.json"
   fi;
   
   echo "$setupCmd"
@@ -213,7 +213,7 @@ cleanup() {
       kill $ejsPidBySearch
     fi;
   fi;
-  
+
   if [ -n "$lodePid" ]
   then
     lodePidBySearch=$(ps x | grep "$DATADIR/lodestar" | grep -v grep | awk '{print $1}')
