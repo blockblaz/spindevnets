@@ -42,7 +42,7 @@ fi;
 
 if [ -n "$ELCLIENT" ]
 then
-  if [ ! -n "$ELCLIENT_IMAGE" ] && [ ! -n  ELCLIENT_BINARY]
+  if [ ! -n "$ELCLIENT_IMAGE" ] && [ ! -n  ELCLIENT_BINARY ]
   then
     case $ELCLIENT in 
       ethereumjs)
