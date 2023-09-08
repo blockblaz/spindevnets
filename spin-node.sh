@@ -1,190 +1,12 @@
 #!/bin/bash
 # set -e
 
-currentDir=$(pwd)
-scriptDir=$(dirname $0)
-scriptDir="$currentDir/$scriptDir"
-
-echo "currentDir=$currentDir"
-echo "scriptDir=$scriptDir"
-
-if [ -n "$NETWORK_DIR" ]
-then
-  echo "sourcing $scriptDir/$NETWORK_DIR/env.vars"
-  source "$scriptDir/$NETWORK_DIR/env.vars"
-  configDir="$scriptDir/$NETWORK_DIR"
-else
-  configDir="$scriptDir"
-fi;
-echo "network config dir: $configDir"
-
-if [ ! -n "$DATADIR" ]
-then
-  DATADIR="$scriptDir/data"
-  # we can safely clean our datadir
-  sudo rm -rf $DATADIR
-fi;
-mkdir $DATADIR
-origDataDir=$DATADIR
-
-argDataDirSource="/data"
-clDataDirSource="/data"
-
-# Check if network arg is provided as the name of the geth genesis json file to use to start
-# the custom network
-if [ ! -n "$NETWORK" ]
-then
-  echo "network not provided via NETWORK env variable, exiting..."
-  exit;
-fi;
-
-if [ ! -n "$JWT_SECRET" ]
-then
-  JWT_SECRET="0xdc6457099f127cf0bac78de8b297df04951281909db4f58b43def7c7151e765d"
-fi;
-
-if [ -n "$ELCLIENT" ]
-then
-  if [ ! -n "$ELCLIENT_IMAGE" ] && [ ! -n  ELCLIENT_BINARY ]
-  then
-    case $ELCLIENT in 
-      ethereumjs)
-        echo "ELCLIENT=$ELCLIENT using local ethereumjs binary from packages/client"
-        ;;
-      geth)
-        if [ ! -n "$NETWORKID" ]
-        then
-          echo "geth requires NETWORKID to be passed in env, exiting..."
-          exit;
-        fi;
-        ELCLIENT_IMAGE="ethereum/client-go:stable"
-        echo "ELCLIENT=$ELCLIENT using ELCLIENT_IMAGE=$ELCLIENT_IMAGE NETWORKID=$NETWORKID"
-        ;;
-      *)
-        echo "ELCLIENT=$ELCLIENT not implemented"
-    esac
-  fi
-else
-  ELCLIENT="ethereumjs"
-  echo "ELCLIENT=$ELCLIENT using local ethereumjs binary from packages/client"
-fi;
-
-
-case $MULTIPEER in
-  syncpeer)
-    echo "setting up to run as a sync only peer to peer1 (bootnode)..."
-    DATADIR="$DATADIR/syncpeer"
-
-    if [ -n "$ELCLIENT_BINARY" ]
-    then
-      argDataDirSource="$DATADIR"
-    fi;
-    if [ -n "$LODE_BINARY" ]
-    then
-      clDataDirSource="$DATADIR"
-    fi;
-
-
-    case $ELCLIENT in 
-      ethereumjs)
-        EL_PORT_ARGS="--port 30305 --rpcEnginePort 8553 --rpcPort 8947 --multiaddrs /ip4/127.0.0.1/tcp/50582/ws --logLevel debug"
-        ;;
-      geth)
-        echo "syncpeer args not yet implemented for geth, exiting..."
-        exit;
-        ;;
-      *)
-        echo "ELCLIENT=$ELCLIENT not implemented"
-    esac
-    
-    CL_PORT_ARGS="--genesisValidators 8 --enr.tcp 9002 --port 9002 --execution.urls http://localhost:8553  --rest.port 9598 --server http://localhost:9598 --network.connectToDiscv5Bootnodes true --logLevel debug"
-    ;;
-
-  peer2)
-    echo "setting up peer2 to run with peer1 (bootnode)..."
-    DATADIR="$DATADIR/peer2"
-
-    if [ -n "$ELCLIENT_BINARY" ]
-    then
-      argDataDirSource="$DATADIR"
-    fi;
-    if [ -n "$LODE_BINARY" ]
-    then
-      clDataDirSource="$DATADIR"
-    fi;
-
-
-    case $ELCLIENT in 
-      ethereumjs)
-        EL_PORT_ARGS="--port 30304 --rpcEnginePort 8552 --rpcPort 8946 --multiaddrs /ip4/127.0.0.1/tcp/50581/ws --bootnodes $elBootnode --logLevel debug"
-        ;;
-      geth)
-        echo "peer2 args not yet implemented for geth, exiting..."
-        exit;
-        ;;
-      *)
-        echo "ELCLIENT=$ELCLIENT not implemented"
-    esac
-
-    CL_PORT_ARGS="--genesisValidators 8 --startValidators 4..7 --enr.tcp 9001 --port 9001 --execution.urls http://localhost:8552  --rest.port 9597 --server http://127.0.0.1:9597 --network.connectToDiscv5Bootnodes true --bootnodes $bootEnrs"
-    ;;
-
-  * )
-    DATADIR="$DATADIR/peer1"
-    if [ -n "$ELCLIENT_BINARY" ]
-    then
-      argDataDirSource="$DATADIR"
-    fi;
-    if [ -n "$LODE_BINARY" ]
-    then
-      clDataDirSource="$DATADIR"
-    fi;
-
-
-    case $ELCLIENT in 
-      ethereumjs)
-        EL_PORT_ARGS="--isSingleNode --extIP 127.0.0.1 --logLevel debug"
-        ;;
-      geth)
-        # geth will be mounted in docker with DATADIR to /data
-        EL_PORT_ARGS="--datadir $argDataDirSource/geth --authrpc.jwtsecret $argDataDirSource/jwtsecret --http --http.api engine,net,eth,web3,debug,admin --http.corsdomain \"*\" --http.port 8545 --http.addr 0.0.0.0 --http.vhosts \"*\" --authrpc.addr 0.0.0.0 --authrpc.vhosts \"*\" --authrpc.port=8551 --syncmode full --networkid $NETWORKID --nodiscover"
-        ;;
-      *)
-        echo "ELCLIENT=$ELCLIENT not implemented"
-    esac
-
-    CL_PORT_ARGS="--sync.isSingleNode --enr.ip 127.0.0.1 --enr.tcp 9000 --enr.udp 9000"
-    if [ ! -n "$MULTIPEER" ]
-    then
-      echo "setting up to run as a solo node..."
-      CL_PORT_ARGS="$CL_PORT_ARGS --genesisValidators 8 --startValidators 0..7"
-    else
-      echo "setting up to run as peer1 (bootnode)..."
-      CL_PORT_ARGS="$CL_PORT_ARGS --genesisValidators 8 --startValidators 0..3"
-    fi;
-    MULTIPEER="peer1"
-esac
-
-mkdir $DATADIR
-echo "EL_PORT_ARGS=$EL_PORT_ARGS"
-echo "CL_PORT_ARGS=$CL_PORT_ARGS"
-
-if [ ! -n "$DATADIR" ] || (touch $DATADIR/shandong.txt) && [ ! -n "$(ls -A $DATADIR)" ]
-then
-  echo "provide a valid DATADIR, currently DATADIR=$DATADIR, exiting ... "
-  exit;
-fi;
-
-# clean these folders as old data can cause issues
-sudo rm -rf $DATADIR/ethereumjs
-sudo rm -rf $DATADIR/geth
-sudo rm -rf $DATADIR/lodestar
-
-# these two commands will harmlessly fail if folders exists
-mkdir $DATADIR/ethereumjs
-mkdir $DATADIR/geth
-mkdir $DATADIR/lodestar
-echo "$JWT_SECRET" > $DATADIR/jwtsecret
+# parse env and set defaults
+source "$(dirname $0)/parse-env.sh"
+# build static client input args
+source "$scriptDir/client-args.sh"
+# ready datadir
+source "$scriptDir/ready-datadir.sh"
 
 # additional step for setting geth genesis now that we have datadir
 if [ "$ELCLIENT" == "geth" ]
@@ -200,69 +22,9 @@ then
   $setupCmd
 fi;
 
-run_cmd(){
-  echo ""
-  echo ""
-  echo "--------------------------------------------------------------------------------------"
-  echo "--------------------------------------------------------------------------------------"
-  execCmd=$1;
-  if [ -n "$DETACHED" ]
-  then
-    echo "running detached: $execCmd"
-    eval "$execCmd"
-  else
-    if [ -n "$WITH_TERMINAL" ]
-    then
-      execCmd="$WITH_TERMINAL $execCmd"
-    fi;
-    echo "running: $execCmd &"
-    eval "$execCmd" &
-  fi;
-  echo "--------------------------------------------------------------------------------------"
-  echo ""
-  echo ""
-  echo ""
-}
+# util for running docker or direct cmds or cleanup
+source "$scriptDir/util-fns.sh"
 
-cleanup() {
-  echo "cleaning up"
-  if [ -n "$ejsPid" ] 
-  then
-    case $ELCLIENT in 
-      ethereumjs)
-        ejsPidBySearch=$(ps x | grep "ts-node bin/cli.ts --dataDir $DATADIR/ethereumjs" | grep -v grep | awk '{print $1}')
-        ;;
-      geth)
-        ejsPidBySearch=$(ps x | grep "$argDataDirSource/geth" | grep -v grep | awk '{print $1}')
-        ;;
-      *)
-        echo "ELCLIENT=$ELCLIENT not implemented"
-    esac
-    
-    echo "cleaning ethereumjs pid:${ejsPid} ejsPidBySearch:${ejsPidBySearch}..."
-    if [ -n "$ELCLIENT_IMAGE" ]
-    then
-      docker rm execution${MULTIPEER} -f
-    else
-      kill $ejsPidBySearch
-    fi;
-  fi;
-
-  if [ -n "$lodePid" ]
-  then
-    lodePidBySearch=$(ps x | grep "$DATADIR/lodestar" | grep -v grep | awk '{print $1}')
-    echo "cleaning lodestar pid:${lodePid} lodePidBySearch:${lodePidBySearch}..."
-    if [ ! -n "$LODE_BINARY" ]
-    then
-      docker rm beacon${MULTIPEER} -f
-    else
-      kill $lodePidBySearch
-    fi;
-  fi;
-
-  ejsPid=""
-  lodePid=""
-}
 
 if [ "$MULTIPEER" == "peer1" ]
 then
@@ -379,6 +141,15 @@ lodePid=$!
 echo "lodePid: $lodePid"
 
 trap "echo exit signal received;cleanup" SIGINT SIGTERM
+
+if [ -n "$ejsPid" ] && [ -n "$lodePid" ] && [ -n "$RUN_SCENARIOS" ]
+then
+  # currently we only run 1 scenario, can be later parsed as "," separated array
+  postCmd="$scriptDir/./tx-post.sh $scriptDir/testscenarios/$RUN_SCENARIOS.json"
+  run_cmd "$postCmd"
+  postPid=$!
+  echo "postPid: $postPid"
+fi;
 
 if [ ! -n "$DETACHED" ] && [ -n "$ejsPid" ] && [ -n "$lodePid" ]
 then
