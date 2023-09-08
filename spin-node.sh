@@ -73,6 +73,14 @@ else
   argDataDirSource="$DATADIR"
 fi;
 
+if [ -n "$LODE_IMAGE" ]
+then
+  clDataDirSource="/data"
+else
+  clDataDirSource="$DATADIR"
+fi;
+
+
 case $MULTIPEER in
   syncpeer)
     echo "setting up to run as a sync only peer to peer1 (bootnode)..."
@@ -336,9 +344,9 @@ then
   then
     LODE_IMAGE="chainsafe/lodestar:latest"
   fi;
-  lodeCmd="docker run --rm --name beacon${MULTIPEER} -v $DATADIR:/data --network host $LODE_IMAGE dev --dataDir $argDataDirSource/lodestar --jwt-secret $argDataDirSource/jwtsecret  $CL_PORT_ARGS"
+  lodeCmd="docker run --rm --name beacon${MULTIPEER} -v $DATADIR:/data --network host $LODE_IMAGE dev --dataDir $clDataDirSource/lodestar --jwt-secret $clDataDirSource/jwtsecret  $CL_PORT_ARGS"
 else
-  lodeCmd="$LODE_BINARY dev --dataDir $argDataDirSource/lodestar --jwt-secret $DATADIR/jwtsecret  $CL_PORT_ARGS"
+  lodeCmd="$LODE_BINARY dev --dataDir $clDataDirSource/lodestar --jwt-secret $clDataDirSource/jwtsecret  $CL_PORT_ARGS"
 fi;
 run_cmd "$lodeCmd"
 lodePid=$!
