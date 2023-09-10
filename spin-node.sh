@@ -13,19 +13,27 @@ if [ "$ELCLIENT" == "geth" ]
 then
   if [ -n "$ELCLIENT_IMAGE" ]
   then
-    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $ELCLIENT_IMAGE --datadir $argDataDirSource/geth --cache.preimagges init /config/genesis.json"
+    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $ELCLIENT_IMAGE --datadir $argDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init /config/genesis.json"
   else
-    setupCmd="$ELCLIENT_BINARY --datadir $argDataDirSource/geth --cache.preimages init $configDir/genesis.json"
+    setupCmd="$ELCLIENT_BINARY --datadir $argDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init $configDir/genesis.json"
   fi;
   
+  echo ""
+  echo ""
+  echo "--------------------------------------------------------------------------------------"
+  echo "--------------------------------------------------------------------------------------"
   echo "$setupCmd"
+  echo "--------------------------------------------------------------------------------------"
+  echo ""
+  echo ""
+  echo ""
   $setupCmd
 fi;
 
 # util for running docker or direct cmds or cleanup
 source "$scriptDir/util-fns.sh"
 
-
+EL_PORT_ARGS="$EL_PORT_ARGS $EXTRA_EL_PARAMS"
 if [ "$MULTIPEER" == "peer1" ]
 then
   case $ELCLIENT in 

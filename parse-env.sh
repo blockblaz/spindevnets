@@ -4,7 +4,7 @@
 
 currentDir=$(pwd)
 scriptDir=$(dirname $0)
-scriptDir="$currentDir/$scriptDir"
+# scriptDir="$currentDir/$scriptDir"
 
 echo "currentDir=$currentDir"
 echo "scriptDir=$scriptDir"
