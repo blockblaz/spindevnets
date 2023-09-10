@@ -13,9 +13,9 @@ if [ "$ELCLIENT" == "geth" ]
 then
   if [ -n "$ELCLIENT_IMAGE" ]
   then
-    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $ELCLIENT_IMAGE --datadir $argDataDirSource/geth init /config/genesis.json"
+    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $ELCLIENT_IMAGE --datadir $argDataDirSource/geth --cache.preimagges init /config/genesis.json"
   else
-    setupCmd="$ELCLIENT_BINARY --datadir $argDataDirSource/geth init $configDir/genesis.json"
+    setupCmd="$ELCLIENT_BINARY --datadir $argDataDirSource/geth --cache.preimages init $configDir/genesis.json"
   fi;
   
   echo "$setupCmd"
