@@ -1,7 +1,7 @@
 #!/bin/bash
 # set -e
 
-VERGE_EPOCH=0
+VERGE_EPOCH=1
 
 
 # configDir=/home/gajinder/spindevnets/kaustinen
