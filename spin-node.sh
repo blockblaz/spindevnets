@@ -82,8 +82,15 @@ then
     done;
   fi
 
-  genTime="$(date +%s)"
-  genTime=$((genTime + 30))
+  # if genesis time is coming from forkscheduler use it else set it up
+  if [ -n "$GENESIS_TIME" ]
+  then
+    genTime=$GENESIS_TIME
+  else
+    genTime="$(date +%s)"
+    genTime=$((genTime + 30))
+  fi;
+
   echo $genTime > "$origDataDir/genesisTime"
   echo $GENESIS_HASH > "$origDataDir/genesisHash"
 else
