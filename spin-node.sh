@@ -51,6 +51,7 @@ then
       ;;
     *)
       echo "ELCLIENT=$ELCLIENT not implemented"
+      exit;
   esac
 
   run_cmd "$ejsCmd"
@@ -90,7 +91,7 @@ else
   while [ ! -n "$CL_GENESIS_HASH" ]
   do
     sleep 3
-    echo "Fetching genesis block from peer1/bootnode ..."
+    echo "Fetching genesis block from peer1/cl ..."
     ejsId=$(( ejsId +1 ))
     responseCmd="curl --location --request GET 'http://localhost:9596/eth/v1/beacon/headers/genesis' --header 'Content-Type: application/json'  2>/dev/null | jq \".data.root\""
     CL_GENESIS_HASH=$(eval "$responseCmd")
@@ -100,26 +101,46 @@ else
   while [ ! -n "$bootEnrs" ]
   do
     sleep 3
-    echo "Fetching bootEnrs block from peer1/bootnode ..."
+    echo "Fetching bootEnrs block from peer1/cl ..."
     ejsId=$(( ejsId +1 ))
     responseCmd="curl --location --request GET 'http://localhost:9596/eth/v1/node/identity' --header 'Content-Type: application/json'  2>/dev/null | jq \".data.enr\""
     bootEnrs=$(eval "$responseCmd")
   done;
 
-  elBootnode=$(cat "$origDataDir/peer1/ethereumjs/$NETWORK/rlpx");
+  # We should curl and get boot enr
+  while [ ! -n "$elBootnode" ]
+  do
+    sleep 3
+    echo "Fetching elBootnode block from peer1/el ..."
+    ejsId=$(( ejsId +1 ))
+    responseCmd="curl -X POST -H 'Content-Type: application/json' http://localhost:8545 --data '{\"jsonrpc\": \"2.0\", \"id\": 42, \"method\": \"admin_nodeInfo\", \"params\": []}' | jq \".result.enode\""
+    elBootnode=$(eval "$responseCmd")
+  done;
+
   EL_PORT_ARGS="$EL_PORT_ARGS --bootnodes $elBootnode"
   CL_PORT_ARGS="$CL_PORT_ARGS --bootnodes $bootEnrs"
 
   GENESIS_HASH=$(cat "$origDataDir/genesisHash")
   genTime=$(cat "$origDataDir/genesisTime")
 
+  if [ ! -n "$GENESIS_HASH" ] || [ ! -n "$genTime" ]
+  then
+    echo "missing GENESIS_HASH=$GENESIS_HASH or genTime=$genTime in origDataDir=$origDataDir"
+    exit;
+  fi;
+
   case $ELCLIENT in 
     ethereumjs)
       ejsCmd="npm run client:start -- --dataDir $DATADIR/ethereumjs --gethGenesis $configDir/$NETWORK.json --rpc --rpcEngine --rpcEngineAuth false $EL_PORT_ARGS"
       ;;
     geth)
-      echo "peer2/syncpeer args not yet implemented for geth, exiting..."
-      exit;
+      if [ -n "$ELCLIENT_IMAGE" ]
+      then
+        # geth will be mounted in docker with DATADIR to /data
+        ejsCmd="docker run --rm --name execution${MULTIPEER} -v $DATADIR:/data --network host $ELCLIENT_IMAGE $EL_PORT_ARGS"
+      else
+        ejsCmd="$ELCLIENT_BINARY $EL_PORT_ARGS"
+      fi;
       ;;
     *)
       echo "ELCLIENT=$ELCLIENT not implemented"
@@ -157,7 +178,7 @@ echo "lodePid: $lodePid"
 
 trap "echo exit signal received;cleanup" SIGINT SIGTERM
 
-if [ -n "$ejsPid" ] && [ -n "$lodePid" ] && [ -n "$RUN_SCENARIOS" ]
+if [ -n "$ejsPid" ] && [ -n "$lodePid" ] && [ -n "$RUN_SCENARIOS" ] && [ ! -n "$MULTIPEER" ]
 then
   # currently we only run 1 scenario, can be later parsed as "," separated array
   postCmd="$scriptDir/./tx-post.sh $scriptDir/testscenarios/$RUN_SCENARIOS.json"

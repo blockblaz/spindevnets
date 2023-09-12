@@ -22,8 +22,6 @@ echo "network config dir: $configDir"
 if [ ! -n "$DATADIR" ]
 then
   DATADIR="$scriptDir/data"
-  # we can safely clean our datadir
-  sudo rm -rf $DATADIR
 fi;
 mkdir $DATADIR
 origDataDir=$DATADIR
