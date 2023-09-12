@@ -29,10 +29,15 @@ You can also combine both commands and launch them together (using & etc) but st
 
 ### Two node run with an optional peer node which just syncs and tracks
 
+
 1. start the bootnode cl<>el
 ```bash
 NETWORK_DIR=kaustinen MULTIPEER=peer1 $REPO_PATH/./spin-node.sh
 ```
+make sure you run the bootnode first because it looks for `fork-scheduler.sh` in `$NETWORK_DIR` and runs the script to `sed` fork scheduling values in the `genesis.json` and `fork.vars` for this network session.
+
+other peers in the following steps will read and use those values.
+
 2. in a different shell start peer2
 ```bash
 NETWORK_DIR=kaustinen MULTIPEER=peer2 $REPO_PATH/./spin-node.sh

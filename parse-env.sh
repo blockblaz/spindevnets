@@ -12,12 +12,21 @@ echo "scriptDir=$scriptDir"
 if [ -n "$NETWORK_DIR" ]
 then
   echo "sourcing $scriptDir/$NETWORK_DIR/env.vars"
-  source "$scriptDir/$NETWORK_DIR/env.vars"
   configDir="$scriptDir/$NETWORK_DIR"
 else
-  configDir="$scriptDir"
+  echo "set NETWORK_DIR env variable to run"
+  exit;
 fi;
+
+# if there is a fork scheduler then run that first only if this is bootnode
+if [ -n "$(ls -A $configDir/fork-scheduler.sh)" ] && ( [ ! -n "$MULTIPEER" ] || [ "$MULTIPEER" == "peer1" ] )
+then
+  source $configDir/fork-scheduler.sh
+fi;
+
 echo "network config dir: $configDir"
+source "$configDir/fork.vars"
+source "$configDir/env.vars"
 
 if [ ! -n "$DATADIR" ]
 then

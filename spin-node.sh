@@ -178,7 +178,7 @@ echo "lodePid: $lodePid"
 
 trap "echo exit signal received;cleanup" SIGINT SIGTERM
 
-if [ -n "$ejsPid" ] && [ -n "$lodePid" ] && [ -n "$RUN_SCENARIOS" ] && [ ! -n "$MULTIPEER" ]
+if [ -n "$ejsPid" ] && [ -n "$lodePid" ] && [ -n "$RUN_SCENARIOS" ] && [ "$MULTIPEER" == "peer1" ]
 then
   # currently we only run 1 scenario, can be later parsed as "," separated array
   postCmd="$scriptDir/./tx-post.sh $scriptDir/testscenarios/$RUN_SCENARIOS.json"

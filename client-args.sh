@@ -27,7 +27,7 @@ case $MULTIPEER in
         echo "ELCLIENT=$ELCLIENT not implemented"
     esac
     
-    CL_PORT_ARGS="--genesisValidators 8 --enr.tcp 9002 --port 9002 --execution.urls http://localhost:8553  --rest.port 9598 --server http://localhost:9598 --network.connectToDiscv5Bootnodes true --logLevel debug"
+    CL_PORT_ARGS="--genesisValidators 8 --enr.tcp 9002 --port 9002 --execution.urls http://localhost:8553  --rest.port 9598 --server http://localhost:9598 --network.connectToDiscv5Bootnodes true"
     ;;
 
   peer2)
