@@ -21,7 +21,7 @@ case $MULTIPEER in
         EL_PORT_ARGS="--port 30305 --rpcEnginePort 8553 --rpcPort 8947 --multiaddrs /ip4/127.0.0.1/tcp/50582/ws --logLevel debug"
         ;;
       geth)
-        EL_PORT_ARGS="--datadir $argDataDirSource/geth --authrpc.jwtsecret $argDataDirSource/jwtsecret --http --http.api engine,net,eth,web3,debug,admin --http.corsdomain \"*\" --http.port 8947 --http.addr 0.0.0.0 --http.vhosts \"*\" --authrpc.addr 0.0.0.0 --authrpc.vhosts \"*\" --authrpc.port=8553 --port=50582  --syncmode full --networkid $NETWORKID --nodiscover"
+        EL_PORT_ARGS="--datadir $argDataDirSource/geth --authrpc.jwtsecret $argDataDirSource/jwtsecret --http --http.api engine,net,eth,web3,debug,admin --http.corsdomain \"*\" --http.port 8947 --http.addr 0.0.0.0 --http.vhosts \"*\" --authrpc.addr 0.0.0.0 --authrpc.vhosts \"*\" --authrpc.port=8553 --port=30305  --syncmode full --networkid $NETWORKID --nodiscover"
         ;;
       *)
         echo "ELCLIENT=$ELCLIENT not implemented"
@@ -49,11 +49,11 @@ case $MULTIPEER in
         EL_PORT_ARGS="--port 30304 --rpcEnginePort 8552 --rpcPort 8946 --multiaddrs /ip4/127.0.0.1/tcp/50581/ws --bootnodes $elBootnode --logLevel debug"
         ;;
       geth)
-        echo "peer2 args not yet implemented for geth, exiting..."
-        exit;
+        EL_PORT_ARGS="--datadir $argDataDirSource/geth --authrpc.jwtsecret $argDataDirSource/jwtsecret --http --http.api engine,net,eth,web3,debug,admin --http.corsdomain \"*\" --http.port 8946 --http.addr 0.0.0.0 --http.vhosts \"*\" --authrpc.addr 0.0.0.0 --authrpc.vhosts \"*\" --authrpc.port=8552 --port=30304  --syncmode full --networkid $NETWORKID --nodiscover"
         ;;
       *)
         echo "ELCLIENT=$ELCLIENT not implemented"
+        exit;
     esac
 
     CL_PORT_ARGS="--genesisValidators 8 --startValidators 4..7 --enr.tcp 9001 --port 9001 --execution.urls http://localhost:8552  --rest.port 9597 --server http://127.0.0.1:9597 --network.connectToDiscv5Bootnodes true --bootnodes $bootEnrs"
