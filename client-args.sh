@@ -83,7 +83,7 @@ case $MULTIPEER in
         echo "ELCLIENT=$ELCLIENT not implemented"
     esac
 
-    CL_PORT_ARGS="--sync.isSingleNode --enr.ip 127.0.0.1 --enr.tcp 9000 --enr.udp 9000"
+    CL_PORT_ARGS="--sync.isSingleNode --enr.ip 127.0.0.1 --enr.tcp 9000 --enr.udp 9000 --rest.namespace '*'"
     if [ ! -n "$MULTIPEER" ]
     then
       echo "setting up to run as a solo node..."
