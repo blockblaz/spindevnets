@@ -19,7 +19,8 @@
     "shanghaiTime":0,
     "pragueTime":1695275599,
     "terminalTotalDifficulty": 0,
-    "terminalTotalDifficultyPassed": true
+    "terminalTotalDifficultyPassed": true,
+    "proofInBlocks": true
   },
   "nonce": "0x56",
   "timestamp": "1679652600",
