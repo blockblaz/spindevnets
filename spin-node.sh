@@ -1,6 +1,16 @@
 #!/bin/bash
 # set -e
 
+
+currentDir=$(pwd)
+scriptDir=$(dirname $0)
+# scriptDir="$currentDir/$scriptDir"
+
+echo "currentDir=$currentDir"
+echo "scriptDir=$scriptDir"
+
+# parse args and set defaults
+# source "$(dirname $0)/parse-args.sh"
 # parse env and set defaults
 source "$(dirname $0)/parse-env.sh"
 # build static client input args
@@ -13,9 +23,9 @@ if [ "$ELCLIENT" == "geth" ]
 then
   if [ -n "$ELCLIENT_IMAGE" ]
   then
-    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $ELCLIENT_IMAGE --datadir $argDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init /config/genesis.json"
+    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $ELCLIENT_IMAGE --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init /config/genesis.json"
   else
-    setupCmd="$ELCLIENT_BINARY --datadir $argDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init $configDir/genesis.json"
+    setupCmd="$ELCLIENT_BINARY --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init $configDir/genesis.json"
   fi;
   
   echo ""

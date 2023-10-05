@@ -1,14 +1,6 @@
 #!/bin/bash
 # set -e
 
-
-currentDir=$(pwd)
-scriptDir=$(dirname $0)
-# scriptDir="$currentDir/$scriptDir"
-
-echo "currentDir=$currentDir"
-echo "scriptDir=$scriptDir"
-
 if [ -n "$NETWORK_DIR" ]
 then
   echo "sourcing $scriptDir/$NETWORK_DIR/env.vars"
@@ -35,7 +27,7 @@ fi;
 mkdir $DATADIR
 origDataDir=$DATADIR
 
-argDataDirSource="/data"
+elDataDirSource="/data"
 clDataDirSource="/data"
 
 # Check if network arg is provided as the name of the geth genesis json file to use to start

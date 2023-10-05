@@ -34,7 +34,7 @@ cleanup() {
         ejsPidBySearch=$(ps x | grep "ts-node bin/cli.ts --dataDir $DATADIR/ethereumjs" | grep -v grep | awk '{print $1}')
         ;;
       geth)
-        ejsPidBySearch=$(ps x | grep "$argDataDirSource/geth" | grep -v grep | awk '{print $1}')
+        ejsPidBySearch=$(ps x | grep "$elDataDirSource/geth" | grep -v grep | awk '{print $1}')
         ;;
       *)
         echo "ELCLIENT=$ELCLIENT not implemented"
