@@ -21,9 +21,14 @@ source "$scriptDir/ready-datadir.sh"
 # additional step for setting geth genesis now that we have datadir
 if [ "$ELCLIENT" == "geth" ]
 then
-  if [ -n "$ELCLIENT_IMAGE" ]
+  if [ -n  "$ELCLIENT_IMAGE" ] && [ ! -n "$GETH_INIT_IMAGE" ]
   then
-    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $ELCLIENT_IMAGE --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init /config/genesis.json"
+    GETH_INIT_IMAGE=$ELCLIENT_IMAGE
+  fi;
+
+  if [ -n "$GETH_INIT_IMAGE" ]
+  then
+    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $GETH_INIT_IMAGE --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init /config/genesis.json"
   else
     setupCmd="$ELCLIENT_BINARY --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init $configDir/genesis.json"
   fi;
