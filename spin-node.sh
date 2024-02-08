@@ -28,9 +28,9 @@ then
 
   if [ -n "$GETH_INIT_IMAGE" ]
   then
-    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $GETH_INIT_IMAGE --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init /config/genesis.json"
+    setupCmd="docker run --rm -v $configDir:/config -v $DATADIR:/data $GETH_INIT_IMAGE --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS1 init /config/genesis.json $EXTRA_EL_SETUP_PARAMS2"
   else
-    setupCmd="$ELCLIENT_BINARY --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS init $configDir/genesis.json"
+    setupCmd="$ELCLIENT_BINARY --datadir $elDataDirSource/geth $EXTRA_EL_SETUP_PARAMS1 init $configDir/genesis.json $EXTRA_EL_SETUP_PARAMS2"
   fi;
   
   echo ""
