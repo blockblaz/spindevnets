@@ -49,7 +49,12 @@ sedPatten="/pragueTime/c\    \"pragueTime\":$PRAGUE_TIME,"
 echo $sedPatten
 sed -i "$sedPatten" "$configDir/genesis.json"
 
+# set fork vars for peers to pick up values when started later
 sedPatten="/ELECTRA_FORK_EPOCH/c\ELECTRA_FORK_EPOCH=$VERGE_EPOCH"
+echo $sedPatten
+sed -i "$sedPatten" "$configDir/fork.vars"
+
+sedPatten="/PRAGUE_TIME/c\PRAGUE_TIME=$PRAGUE_TIME"
 echo $sedPatten
 sed -i "$sedPatten" "$configDir/fork.vars"
 
