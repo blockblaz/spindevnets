@@ -53,7 +53,7 @@ if [ "$MULTIPEER" == "peer1" ]
 then
   case $ELCLIENT in 
     ethereumjs)
-      ejsCmd="npm run client:start:ts -- --dataDir $DATADIR/ethereumjs --gethGenesis $configDir/$NETWORK.json --rpc --rpcEngine --rpcEngineAuth false $EL_PORT_ARGS"
+      ejsCmd="npm run client:start:ts -- --dataDir $DATADIR/ethereumjs --gethGenesis $configDir/genesis.json --rpc --rpcEngine --rpcEngineAuth false $EL_PORT_ARGS"
       ;;
     geth)
       if [ -n "$ELCLIENT_IMAGE" ]
